@@ -28,5 +28,3 @@ Dockerhub is the tool for containers, images, etc.
 Angular is to help with server. 
 Github is github. 
 Google searches and ai help me with the coding of bash in files. 
-
-Everything is in [DockerProj4](https://github.com/SnakeLitt/DockerProj4)
