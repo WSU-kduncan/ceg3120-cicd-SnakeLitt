@@ -1,0 +1,50 @@
+[
+  {
+    "id": "deploy-my-app", // Choose a unique and descriptive ID for your hook
+    "execute-command": "~/DockerProj4/deployment/deploy.sh", // *** IMPORTANT: Replace with the ACTUAL path to your bash script ***
+    "command-working-directory": "~/DockerProj4/deployment", // *** IMPORTANT: Replace with the directory where your script should run ***
+    "response-message": "Webhook processed successfully.", // Optional: Message sent back to the caller on success
+
+    // --- Trigger Rule: Validation ---
+    "trigger-rule": {
+      "match": {
+        // This uses HMAC-SHA256 signature validation.
+        // It's the standard secure method for GitHub and many other services.
+        // It validates BOTH that the payload hasn't been tampered with AND that it came from the source holding the secret.
+        "type": "payload-hash-sha256",
+        "secret": "snakelittensecret", // *** IMPORTANT: Replace with your strong, unique secret ***
+        "parameter": {
+          "source": "header",
+          "name": "X-Hub-Signature-256" // Standard GitHub header for SHA256 signatures. Use X-Hub-Signature for SHA1 (less secure).
+                                         // If using a different service, check its documentation for the correct header name.
+        }
+
+        // --- Alternative: Simple Shared Secret (Less Secure - Not Recommended for GitHub) ---
+        // If you absolutely cannot use HMAC and need a simpler secret check (e.g., a value in a header or query parameter):
+        /*
+        "type": "value",
+        "value": "jake21", // *** IMPORTANT: Replace with your simple secret ***
+        "parameter": {
+          "source": "header", // Or "url" if the secret is in the query string
+          "name": "X-Webhook-Secret" // *** IMPORTANT: Use the actual header or query parameter name ***
+        }
+        */
+
+        // --- Note on GitHub IP Validation ---
+        // Validating solely based on GitHub's IP ranges is generally NOT recommended.
+        // IPs can change, and requests can potentially be spoofed.
+        // Using the HMAC signature ('payload-hash-sha256' above) is the secure and standard way to verify requests genuinely originated from your configured GitHub webhook.
+      }
+    }
+    // Optional: Pass arguments or environment variables to your script
+    // "pass-arguments-to-command": [
+    //   { "source": "payload", "name": "repository.full_name" }, // Example: Pass repo name from payload
+    //   { "source": "header", "name": "X-GitHub-Event" }      // Example: Pass event type from header
+    // ],
+    // "pass-environment-to-command": [
+    //   { "source": "payload", "envname": "REPO_NAME", "name": "repository.name" },
+    //   { "source": "payload", "envname": "PUSHER_EMAIL", "name": "pusher.email" }
+    // ]
+    // Note: Your script can also access the full payload via the HOOK_PAYLOAD environment variable by default.
+  }
+]
